@@ -1,7 +1,7 @@
 """LSTM with CTC for handwritten text recognition within a line."""
 import tensorflow.keras.backend as K
 from tensorflow.python.client import device_lib  # pylint: disable=no-name-in-module
-from tensorflow.keras.layers import Dense, Input, Reshape, TimeDistributed, Lambda, LSTM, CuDNNLSTM
+from tensorflow.keras.layers import Dense, Input, Reshape, TimeDistributed, Lambda, LSTM, CuDNNLSTM, Bidirectional
 from tensorflow.keras.models import Model as KerasModel
 
 
@@ -48,7 +48,7 @@ def line_lstm_ctc(input_shape, output_shape, window_width=28, window_stride=14):
     convnet_outputs = TimeDistributed(convnet)(image_patches)
     # (num_windows, 128)
 
-    lstm_output = lstm_fn(128, return_sequences=True)(convnet_outputs)
+    lstm_output = Bidirectional(lstm_fn(128, return_sequences=True))(convnet_outputs)
     # (num_windows, 128)
 
     softmax_output = Dense(num_classes, activation='softmax', name='softmax_output')(lstm_output)
